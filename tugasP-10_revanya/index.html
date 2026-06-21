@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>Project Phoenix - AR Burung Phoenix</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+
+  <!-- A-Frame core -->
+  <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+  <!-- AR.js untuk A-Frame -->
+  <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.5/aframe/build/aframe-ar.js"></script>
+  <!-- aframe-extras: menyediakan komponen animation-mixer untuk memutar animasi built-in GLTF -->
+  <script src="https://cdn.jsdelivr.net/npm/aframe-extras@7.2.0/dist/aframe-extras.min.js"></script>
+
+  <style>
+    body { margin: 0; overflow: hidden; }
+    .a-enter-vr { display: none; } /* sembunyikan tombol VR bawaan A-Frame */
+  </style>
+</head>
+<body>
+
+  <!-- Elemen audio efek suara -->
+  <audio id="suaraPhoenix" src="audio/suara.mp3" preload="auto"></audio>
+
+  <a-scene
+    embedded
+    arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix;"
+    vr-mode-ui="enabled: false"
+    renderer="logarithmicDepthBuffer: true; antialias: true;"
+  >
+
+    <!-- Marker pattern -->
+    <a-marker type="pattern" url="assets/marker.patt" id="markerPhoenix">
+
+      <!-- Model GLTF burung Phoenix dengan animasi built-in -->
+      <a-entity
+        id="phoenixModel"
+        gltf-model="assets/phoenix_bird.glb"
+        scale="0.2 0.2 0.2"
+        position="0 0 0"
+        rotation="0 0 0"
+        animation-mixer="loop: repeat; timeScale: 1;"
+      ></a-entity>
+
+    </a-marker>
+
+    <a-entity camera></a-entity>
+  </a-scene>
+
+  <script>
+    const marker = document.querySelector('#markerPhoenix');
+    const suara  = document.querySelector('#suaraPhoenix');
+
+    // Saat marker terdeteksi -> putar efek suara dari awal
+    marker.addEventListener('markerFound', () => {
+      suara.currentTime = 0;
+      suara.play().catch(err => {
+        console.warn('Audio diblokir browser, butuh interaksi user pertama:', err);
+      });
+    });
+
+    // Saat marker hilang dari kamera -> hentikan suara
+    marker.addEventListener('markerLost', () => {
+      suara.pause();
+      suara.currentTime = 0;
+    });
+  </script>
+
+</body>
+</html>
